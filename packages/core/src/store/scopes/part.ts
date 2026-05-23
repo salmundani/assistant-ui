@@ -26,6 +26,13 @@ export type PartMethods = {
    * This is useful when a tool has requested human input and is waiting for a response.
    */
   resumeToolCall(payload: unknown): void;
+  /**
+   * Send an approval verdict for a tool call awaiting server-side approval.
+   * The runtime adapter receives the verdict along with the interrupt
+   * payload and is responsible for routing it (e.g. AI SDK forwards to
+   * `chatHelpers.addToolApprovalResponse`).
+   */
+  respondToApproval(options: { approved: boolean; reason?: string }): void;
   __internal_getRuntime?(): MessagePartRuntime;
 };
 

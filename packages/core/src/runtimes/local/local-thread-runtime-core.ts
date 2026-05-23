@@ -8,6 +8,7 @@ import { shouldContinue } from "./should-continue";
 import type { LocalRuntimeOptionsBase } from "./local-runtime-options";
 import type {
   AddToolResultOptions,
+  RespondToToolApprovalOptions,
   ResumeToolCallOptions,
   ThreadSuggestion,
   ThreadRuntimeCore,
@@ -534,5 +535,9 @@ export class LocalThreadRuntimeCore
 
   public resumeToolCall(_options: ResumeToolCallOptions) {
     throw new Error("Local runtime does not support resuming tool calls.");
+  }
+
+  public respondToToolApproval(_options: RespondToToolApprovalOptions) {
+    throw new Error("Local runtime does not support tool approval responses.");
   }
 }

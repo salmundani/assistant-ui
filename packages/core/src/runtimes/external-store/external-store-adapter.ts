@@ -108,6 +108,14 @@ type ExternalStoreAdapterBase<T> = {
   onResumeToolCall?:
     | ((options: { toolCallId: string; payload: unknown }) => void)
     | undefined;
+  onToolApprovalResponse?:
+    | ((options: {
+        toolCallId: string;
+        interruptPayload: unknown;
+        approved: boolean;
+        reason?: string;
+      }) => void)
+    | undefined;
   convertMessage?: ExternalStoreMessageConverter<T> | undefined;
   adapters?:
     | {

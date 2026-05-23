@@ -350,6 +350,20 @@ export const useAISDKRuntime = <UI_MESSAGE extends UIMessage = UIMessage>(
     },
     onResumeToolCall: (options) =>
       toolInvocations.resume(options.toolCallId, options.payload),
+    onToolApprovalResponse: ({ interruptPayload, approved, reason }) => {
+      const id = (interruptPayload as { id?: string } | undefined)?.id;
+      if (!id)
+        throw new Error(
+          "AI SDK approval response requires interrupt.payload.id; got " +
+            JSON.stringify(interruptPayload),
+        );
+      chatHelpers.addToolApprovalResponse({
+        id,
+        approved,
+        ...(reason !== undefined && { reason }),
+        options: { metadata: lastRunConfigRef.current },
+      });
+    },
     ...(onResume && { onResume }),
     ...(suggestions && { suggestions }),
     adapters: {

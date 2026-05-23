@@ -71,6 +71,15 @@ export type ToolCallMessagePartProps<
      * paused frontend tool execution.
      */
     resume: (payload: unknown) => void;
+    /**
+     * Approve or deny a tool call awaiting server-side approval (e.g. AI SDK
+     * `state: "approval-requested"`). The approval id is read from
+     * `interrupt.payload.id` on this part.
+     */
+    respondToApproval: (options: {
+      approved: boolean;
+      reason?: string;
+    }) => void;
   };
 
 /** Component used to render a tool-call message part. */

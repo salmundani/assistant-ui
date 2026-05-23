@@ -1,6 +1,7 @@
 import type { AppendMessage, ThreadMessage } from "../../types/message";
 import type {
   AddToolResultOptions,
+  RespondToToolApprovalOptions,
   ResumeRunConfig,
   ResumeToolCallOptions,
   StartRunConfig,
@@ -370,6 +371,12 @@ export class ExternalStoreThreadRuntimeCore
     if (!this._store.onResumeToolCall)
       throw new Error("Runtime does not support resuming tool calls.");
     this._store.onResumeToolCall(options);
+  }
+
+  public respondToToolApproval(options: RespondToToolApprovalOptions) {
+    if (!this._store.onToolApprovalResponse)
+      throw new Error("Runtime does not support tool approval responses.");
+    this._store.onToolApprovalResponse(options);
   }
 
   public override reset(initialMessages?: readonly ThreadMessageLike[]) {

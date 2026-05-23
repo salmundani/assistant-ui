@@ -30,6 +30,7 @@ const createChatHelpers = (messages: any[] = []) => {
     regenerate: vi.fn().mockResolvedValue(undefined),
     addToolResult: vi.fn(),
     addToolOutput: vi.fn(),
+    addToolApprovalResponse: vi.fn(),
     stop: vi.fn(),
   };
 
@@ -296,6 +297,83 @@ describe("useAISDKRuntime", () => {
         runConfig: { custom: { turnId: "t-42" } },
       }),
     );
+  });
+
+  it("extracts id from interruptPayload and forwards to chat.addToolApprovalResponse", async () => {
+    const chat = createChatHelpers();
+
+    const { result } = renderHook(() => useAISDKRuntime(chat));
+
+    act(() => {
+      (
+        result.current.thread as unknown as {
+          __internal_threadBinding: { getState: () => any };
+        }
+      ).__internal_threadBinding
+        .getState()
+        .respondToToolApproval({
+          toolCallId: "tc-1",
+          interruptPayload: { id: "appr-123" },
+          approved: true,
+          reason: "ok",
+        });
+    });
+
+    expect(chat.addToolApprovalResponse).toHaveBeenCalledTimes(1);
+    expect(chat.addToolApprovalResponse).toHaveBeenCalledWith({
+      id: "appr-123",
+      approved: true,
+      reason: "ok",
+      options: { metadata: undefined },
+    });
+  });
+
+  it("omits reason when respondToToolApproval is called without one", async () => {
+    const chat = createChatHelpers();
+
+    const { result } = renderHook(() => useAISDKRuntime(chat));
+
+    act(() => {
+      (
+        result.current.thread as unknown as {
+          __internal_threadBinding: { getState: () => any };
+        }
+      ).__internal_threadBinding
+        .getState()
+        .respondToToolApproval({
+          toolCallId: "tc-1",
+          interruptPayload: { id: "appr-456" },
+          approved: false,
+        });
+    });
+
+    expect(chat.addToolApprovalResponse).toHaveBeenCalledWith({
+      id: "appr-456",
+      approved: false,
+      options: { metadata: undefined },
+    });
+  });
+
+  it("throws when interruptPayload is missing the AI SDK id field", async () => {
+    const chat = createChatHelpers();
+
+    const { result } = renderHook(() => useAISDKRuntime(chat));
+
+    expect(() => {
+      (
+        result.current.thread as unknown as {
+          __internal_threadBinding: { getState: () => any };
+        }
+      ).__internal_threadBinding
+        .getState()
+        .respondToToolApproval({
+          toolCallId: "tc-1",
+          interruptPayload: { value: "no-id-here" },
+          approved: true,
+        });
+    }).toThrow(/AI SDK approval response requires interrupt\.payload\.id/);
+
+    expect(chat.addToolApprovalResponse).not.toHaveBeenCalled();
   });
 
   it("rejects when resumeRun is called without an onResume adapter", async () => {

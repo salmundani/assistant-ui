@@ -45,6 +45,13 @@ export type ResumeToolCallOptions = {
   payload: unknown;
 };
 
+export type RespondToToolApprovalOptions = {
+  toolCallId: string;
+  interruptPayload: unknown;
+  approved: boolean;
+  reason?: string;
+};
+
 export type SubmitFeedbackOptions = {
   messageId: string;
   type: "negative" | "positive";
@@ -137,6 +144,7 @@ export type ThreadRuntimeCore = Readonly<{
 
   addToolResult: (options: AddToolResultOptions) => void;
   resumeToolCall: (options: ResumeToolCallOptions) => void;
+  respondToToolApproval: (options: RespondToToolApprovalOptions) => void;
 
   speak: (messageId: string) => void;
   stopSpeaking: () => void;

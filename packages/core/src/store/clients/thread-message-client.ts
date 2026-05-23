@@ -38,6 +38,9 @@ const ThreadMessagePartClient = resource(
       resumeToolCall: () => {
         throw new Error("Not supported");
       },
+      respondToApproval: () => {
+        throw new Error("Not supported");
+      },
     };
   },
 );
